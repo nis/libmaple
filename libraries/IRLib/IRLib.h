@@ -44,18 +44,38 @@
 #define IRLIB_APPLE_MENU		6
 #define IRLIB_APPLE_PLAY		7
 
+#define U_SEC_PER_TICK 			50	// us per interrupt tick.
+#define MAX_COUNTER				10000/U_SEC_PER_TICK // The maximum value for the timer
+
+// IR ISR States
+#define IRLIB_STATE_IDLE			0
+#define IRLIB_STATE_COUNT_MARK		1
+#define IRLIB_STATE_COUNT_NOT_MARK	2
+#define IRLIB_STATE_COMMAND_END		3
+
+// IR Sensor
+#define IR_MARK			0
+#define IR_NOT_MARK		1
+
 /*****************************   Constants   *******************************/
 
 /*****************************   Variables   *******************************/
 
+struct ir_sequence {
+	uint16 marks[80];
+	uint8 pointer;
+};
+
 /*****************************     Class     *******************************/
+
+void irlib_interrupt_handler(void);
 
 class IRLib {
 	public:
-		void irlib_init(uint8 ir_input_pin); 		// Setup.
-		void irlib_interrupt_handler(void); 		// Statemachine for handling incomming data.
 		
-		uint8 irlib_decode_apple(void);				// Decodes and returns the last received command.
+		IRLib(uint8 input_pin); 		// Setup.
+		void ir_debug(void);
+		//uint8 irlib_decode_apple(void);				// Decodes and returns the last received command.
 													// Does not delete command if the command is being repeated.
 													
 		
