@@ -24,8 +24,8 @@
  * SOFTWARE.
  *****************************************************************************/
 
-#ifndef _IRLIB_H_
-#define _IRLIB_H_
+#ifndef _ARRLIB_H_
+#define _ARRLIB_H_
 
 /***************************** Include files *******************************/
 
@@ -34,46 +34,73 @@
 /*****************************    Defines    *******************************/
 
 // IR commands
-#define IRLIB_NO_COMMAND		0 	// No valid command received
-// Apple remote commands
-#define IRLIB_APPLE_UP			1
-#define IRLIB_APPLE_DOWN		2
-#define IRLIB_APPLE_LEFT		3
-#define IRLIB_APPLE_RIGHT		4
-#define IRLIB_APPLE_CENTER		5
-#define IRLIB_APPLE_MENU		6
-#define IRLIB_APPLE_PLAY		7
-
-#define U_SEC_PER_TICK 			50	// us per interrupt tick.
-#define MAX_COUNTER				10000/U_SEC_PER_TICK // The maximum value for the timer
+#define ARRLIB_NO_COMMAND					0 	// No valid command received
+// Apple remote commands        			
+#define ARRLIB_APPLE_UP						1
+#define ARRLIB_APPLE_DOWN					2
+#define ARRLIB_APPLE_LEFT					3
+#define ARRLIB_APPLE_RIGHT					4
+#define ARRLIB_APPLE_CENTER					5
+#define ARRLIB_APPLE_MENU					6
+#define ARRLIB_APPLE_PLAY					7
+                                	
+#define ARRLIB_U_SEC_PER_TICK 				100	// us per interrupt tick.
+#define ARRLIB_MAX_COUNTER					10000/ARRLIB_U_SEC_PER_TICK // The maximum value for the timer
+#define ARRLIB_GAP_US						5000
+#define ARRLIB_GAP_TICKS					ARRLIB_GAP_US/ARRLIB_U_SEC_PER_TICK
 
 // IR ISR States
-#define IRLIB_STATE_IDLE			0
-#define IRLIB_STATE_COUNT_MARK		1
-#define IRLIB_STATE_COUNT_NOT_MARK	2
-#define IRLIB_STATE_COMMAND_END		3
+#define ARRLIB_STATE_IDLE					0
+#define ARRLIB_STATE_COUNT_MARK				1
+#define ARRLIB_STATE_COUNT_NOT_MARK			2
+#define ARRLIB_STATE_COMMAND_END			3
 
 // IR Sensor
-#define IR_MARK			0
-#define IR_NOT_MARK		1
+#define ARRLIB_IR_MARK						0
+#define ARRLIB_IR_NOT_MARK					1
+#define ARRLIB_IR_RAW_BUFFER_LENGTH			80
+
+// us times for the NEC IR protocol
+#define ARRLIB_START_H						9000
+#define ARRLIB_START_L						4500
+#define ARRLIB_BIT_H						560
+#define ARRLIB_ONE_L						1687
+#define ARRLIB_ZERO_L						560
+#define ARRLIB_REPEAT_L						2250
+
+// Pulse length converted to ticks
+#define ARRLIB_START_H_MIN 		(uint8)(ARRLIB_START_H / ARRLIB_U_SEC_PER_TICK) - 3
+#define ARRLIB_START_H_MAX 		(uint8)(ARRLIB_START_H / ARRLIB_U_SEC_PER_TICK) + 3
+#define ARRLIB_START_L_MIN 		(uint8)(ARRLIB_START_L / ARRLIB_U_SEC_PER_TICK) - 3
+#define ARRLIB_START_L_MAX 		(uint8)(ARRLIB_START_L / ARRLIB_U_SEC_PER_TICK) + 3
+#define ARRLIB_BIT_H_MIN 		(uint8)(ARRLIB_BIT_H / ARRLIB_U_SEC_PER_TICK) - 2
+#define ARRLIB_BIT_H_MAX 		(uint8)(ARRLIB_BIT_H / ARRLIB_U_SEC_PER_TICK) + 2
+#define ARRLIB_ONE_L_MIN 		(uint8)(ARRLIB_ONE_L / ARRLIB_U_SEC_PER_TICK) - 3
+#define ARRLIB_ONE_L_MAX 		(uint8)(ARRLIB_ONE_L / ARRLIB_U_SEC_PER_TICK) + 3
+#define ARRLIB_ZERO_L_MIN		(uint8)(ARRLIB_ZERO_L / ARRLIB_U_SEC_PER_TICK) - 2
+#define ARRLIB_ZERO_L_MAX 		(uint8)(ARRLIB_ZERO_L / ARRLIB_U_SEC_PER_TICK) + 2
+#define ARRLIB_REPEAT_L_MIN 	(uint8)(ARRLIB_REPEAT_L / ARRLIB_U_SEC_PER_TICK) - 3
+#define ARRLIB_REPEAT_L_MAX 	(uint8)(ARRLIB_REPEAT_L / ARRLIB_U_SEC_PER_TICK) + 3
+
+
 
 /*****************************   Constants   *******************************/
 
 /*****************************   Variables   *******************************/
 
 struct ir_sequence {
-	uint16 marks[80];
-	uint8 pointer;
+	uint16 raw[80];
+	uint8 raw_pointer;
 };
 
 /*****************************     Class     *******************************/
 
-void irlib_interrupt_handler(void);
+void arrlib_interrupt_handler(void);
 
-class IRLib {
+class ARRLib {
 	public:
 		
-		IRLib(uint8 input_pin); 		// Setup.
+		ARRLib(uint8 input_pin); 		// Setup.
 		void ir_debug(void);
 		//uint8 irlib_decode_apple(void);				// Decodes and returns the last received command.
 													// Does not delete command if the command is being repeated.

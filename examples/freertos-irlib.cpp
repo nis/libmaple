@@ -1,10 +1,10 @@
 #include "wirish.h"
 #include "libraries/FreeRTOS/MapleFreeRTOS.h"
-#include "libraries/IRLib/IRLib.h"
+#include "libraries/ARRLib/ARRLib.h"
 
 #define IR_RECEIVER_PIN 14 // IR Receiver pin
 
-IRLib ir(IR_RECEIVER_PIN);
+ARRLib ir(IR_RECEIVER_PIN);
 
 static void vLEDFlashTask(void *pvParameters) {
     for (;;) {

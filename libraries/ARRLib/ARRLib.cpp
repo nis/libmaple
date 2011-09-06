@@ -26,7 +26,7 @@
 
 /***************************** Include files *******************************/
 
-#include "IRLib.h"
+#include "ARRLib.h"
 
 /*****************************    Defines    *******************************/
 
@@ -41,21 +41,23 @@ byte new_command = 0;
 		
 /*****************************   Functions   *******************************/
 
-void IRLib::ir_debug(void) {
+void ARRLib::ir_debug(void) {
 	//Serial1.println(my_debug, DEC);
 	if(new_command)
 	{	
-		Serial1.println("Sequence: ");
-		for(uint8 i = 0; i < last_command.pointer; ++i)
+		Serial1.print("Sequence: [");
+		Serial1.print(last_command.raw_pointer, DEC);
+		Serial1.println("] ");
+		for(uint8 i = 0; i < last_command.raw_pointer; ++i)
 		{
 			Serial1.print("\t");
-			Serial1.println(last_command.marks[i], DEC);
+			Serial1.println(last_command.raw[i]*ARRLIB_U_SEC_PER_TICK, DEC);
 		}
 		new_command = 0;
 	}
 }
 
-IRLib::IRLib(uint8 input_pin) {
+ARRLib::ARRLib(uint8 input_pin) {
     pinMode(input_pin, INPUT);
 	ir_input_pin = input_pin;
 	
@@ -63,61 +65,74 @@ IRLib::IRLib(uint8 input_pin) {
 	
 	timer.pause();
 	timer.setPrescaleFactor(72);
-	timer.setOverflow(U_SEC_PER_TICK);
+	timer.setOverflow(ARRLIB_U_SEC_PER_TICK);
 	timer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
 	timer.setCompare(TIMER_CH1, 1);
-	timer.attachCompare1Interrupt(irlib_interrupt_handler);
+	timer.attachCompare1Interrupt(arrlib_interrupt_handler);
 	timer.refresh();
 	timer.resume();
 }
 
-void irlib_interrupt_handler(void) {
-	static byte state = IRLIB_STATE_IDLE;
-	static uint16 counter = 0;
+void arrlib_interrupt_handler(void) {
+	static byte state = ARRLIB_STATE_IDLE;
+	static uint32 counter = 0;
 	static ir_sequence seq;
 	
 	byte ir_signal = digitalRead(ir_input_pin);
 	
+	counter++;
+	
+	if(seq.raw_pointer >= ARRLIB_IR_RAW_BUFFER_LENGTH)
+	{
+		state = ARRLIB_STATE_IDLE;
+	}
+	
 	switch (state) {
-		case IRLIB_STATE_IDLE:
-			if(ir_signal == IR_MARK)
+		case ARRLIB_STATE_IDLE:
+			if(ir_signal == ARRLIB_IR_MARK)
 			{
-				counter = 0;
-				ir_sequence new_seq;
-				seq = new_seq;
-				state = IRLIB_STATE_COUNT_MARK;
+				if(counter < ARRLIB_GAP_TICKS)
+				{
+					counter = 0;
+				} else {
+					seq.raw_pointer = 0;
+					//seq.marks[seq.pointer++] = counter;
+					counter = 0;
+					state = ARRLIB_STATE_COUNT_MARK;
+				}
 			}
 		break;
 		
-		case IRLIB_STATE_COUNT_MARK:
-			counter++;
-			if(ir_signal == IR_NOT_MARK)
+		case ARRLIB_STATE_COUNT_MARK:
+			if(ir_signal == ARRLIB_IR_NOT_MARK)
 			{
-				seq.marks[seq.pointer] = counter;
-				seq.pointer++;
+				seq.raw[seq.raw_pointer++] = counter;
 				counter = 0;
-				state = IRLIB_STATE_COUNT_NOT_MARK;
+				state = ARRLIB_STATE_COUNT_NOT_MARK;
 			}
 		break;
-		
-		case IRLIB_STATE_COUNT_NOT_MARK:
-			counter++;
-			if(counter > 200)
-			{
-				state = IRLIB_STATE_COMMAND_END;
-			} else if(ir_signal == IR_MARK) 
-			{
-				seq.marks[seq.pointer] = counter;
-				seq.pointer++;
-				counter = 0;
-				state = IRLIB_STATE_COUNT_MARK;
+
+ 		case ARRLIB_STATE_COUNT_NOT_MARK:
+ 			if(ir_signal == ARRLIB_IR_MARK)
+ 			{
+ 				seq.raw[seq.raw_pointer++] = counter;
+ 				counter = 0;
+ 				state = ARRLIB_STATE_COUNT_MARK;
+ 			} else {
+				if(counter > ARRLIB_GAP_TICKS)
+				{
+					state = ARRLIB_STATE_COMMAND_END;
+				}
 			}
-		break;
-		
-		case IRLIB_STATE_COMMAND_END:
-			last_command = seq;
-			new_command = 1;
-			state = IRLIB_STATE_IDLE;
+ 		break;
+
+		case ARRLIB_STATE_COMMAND_END:
+			if(seq.raw_pointer == 67)
+			{
+				last_command = seq;
+				new_command = 1;
+			}
+			state = ARRLIB_STATE_IDLE;
 		break;
 	}
 }

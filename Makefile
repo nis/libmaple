@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := sketch
 
 # Valid BOARDs: maple, maple_native, ...
-BOARD ?= maple
+BOARD ?= maple_mini
 MEMORY_TARGET ?= flash
 
 # USB ID for DFU upload
@@ -96,7 +96,7 @@ LIBMAPLE_MODULES += $(SRCROOT)/libraries/Wire
 
 # Experimental libraries:
 LIBMAPLE_MODULES += $(SRCROOT)/libraries/FreeRTOS
-LIBMAPLE_MODULES += $(SRCROOT)/libraries/IRLib
+LIBMAPLE_MODULES += $(SRCROOT)/libraries/ARRLib
 
 # call each module rules.mk
 $(foreach m,$(LIBMAPLE_MODULES),$(eval $(call LIBMAPLE_MODULE_template,$(m))))
