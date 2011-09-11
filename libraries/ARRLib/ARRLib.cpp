@@ -47,12 +47,21 @@ void ARRLib::ir_debug(void) {
 	{	
 		Serial1.print("Sequence: [");
 		Serial1.print(last_command.raw_pointer, DEC);
-		Serial1.println("] ");
-		for(uint8 i = 0; i < last_command.raw_pointer; ++i)
-		{
-			Serial1.print("\t");
-			Serial1.println(last_command.raw[i]*ARRLIB_U_SEC_PER_TICK, DEC);
-		}
+		Serial1.print("] ");
+		Serial1.print(last_command.decoded, DEC);
+		Serial1.print(" Data: ");
+		Serial1.print(last_command.data[0], HEX);
+		Serial1.print(" ");
+		Serial1.print(last_command.data[1], HEX);
+		Serial1.print(" ");
+		Serial1.print(last_command.data[2], HEX);
+		Serial1.print(" ");
+		Serial1.println(last_command.data[3], HEX);
+		// for(uint8 i = 0; i < last_command.raw_pointer; ++i)
+		// {
+		// 	Serial1.print("\t");
+		// 	Serial1.println(last_command.raw[i], DEC);
+		// }
 		new_command = 0;
 	}
 }
@@ -96,6 +105,7 @@ void arrlib_interrupt_handler(void) {
 					counter = 0;
 				} else {
 					seq.raw_pointer = 0;
+					seq.decoded = 0;
 					//seq.marks[seq.pointer++] = counter;
 					counter = 0;
 					state = ARRLIB_STATE_COUNT_MARK;
@@ -129,6 +139,73 @@ void arrlib_interrupt_handler(void) {
 		case ARRLIB_STATE_COMMAND_END:
 			if(seq.raw_pointer == 67)
 			{
+				if(
+						(seq.raw[0] >= ARRLIB_START_H_MIN && seq.raw[0] <= ARRLIB_START_H_MAX) &&
+						(seq.raw[1] >= ARRLIB_START_L_MIN && seq.raw[1] <= ARRLIB_START_L_MAX)
+				  )
+				{
+					// First byte
+					// for(uint8 i = 17; i > 2; i = i - 2)
+					// {
+					// 	if(seq.raw[i] >= ARRLIB_ONE_L_MIN && seq.raw[i] <= ARRLIB_ONE_L_MAX)
+					// 	{
+					// 		seq.data[0] = (seq.data[0] << 1) | 1;
+					// 		seq.decoded++;
+					// 	} else if(seq.raw[i] >= ARRLIB_ZERO_L_MIN && seq.raw[i] <= ARRLIB_ZERO_L_MAX)
+					// 	{
+					// 		seq.data[0] <<= 1;
+					// 		
+					// 		seq.decoded++;
+					// 	}
+					// }
+					
+					// Second byte
+					// for(uint8 i = 33; i > 18; i = i - 2)
+					// {
+					// 	if(seq.raw[i] >= ARRLIB_ONE_L_MIN && seq.raw[i] <= ARRLIB_ONE_L_MAX)
+					// 	{
+					// 		seq.data[1] = (seq.data[1] << 1) | 1;
+					// 		seq.decoded++;
+					// 	} else if(seq.raw[i] >= ARRLIB_ZERO_L_MIN && seq.raw[i] <= ARRLIB_ZERO_L_MAX)
+					// 	{
+					// 		seq.data[1] <<= 1;
+					// 		
+					// 		seq.decoded++;
+					// 	}
+					// }
+					
+					// Third byte
+					for(uint8 i = 49; i > 34; i = i - 2)
+					{
+						if(seq.raw[i] >= ARRLIB_ONE_L_MIN && seq.raw[i] <= ARRLIB_ONE_L_MAX)
+						{
+							seq.data[2] = (seq.data[2] << 1) | 1;
+							seq.decoded++;
+						} else if(seq.raw[i] >= ARRLIB_ZERO_L_MIN && seq.raw[i] <= ARRLIB_ZERO_L_MAX)
+						{
+							seq.data[2] <<= 1;
+							
+							seq.decoded++;
+						}
+					}
+					
+					// Fourth byte
+					for(uint8 i = 65; i > 50; i = i - 2)
+					{
+						if(seq.raw[i] >= ARRLIB_ONE_L_MIN && seq.raw[i] <= ARRLIB_ONE_L_MAX)
+						{
+							seq.data[3] = (seq.data[3] << 1) | 1;
+							seq.decoded++;
+						} else if(seq.raw[i] >= ARRLIB_ZERO_L_MIN && seq.raw[i] <= ARRLIB_ZERO_L_MAX)
+						{
+							seq.data[3] <<= 1;
+							
+							seq.decoded++;
+						}
+					}
+				} else {
+					seq.decoded = 0;
+				}
 				last_command = seq;
 				new_command = 1;
 			}

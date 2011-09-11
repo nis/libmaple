@@ -69,18 +69,42 @@
 #define ARRLIB_REPEAT_L						2250
 
 // Pulse length converted to ticks
-#define ARRLIB_START_H_MIN 		(uint8)(ARRLIB_START_H / ARRLIB_U_SEC_PER_TICK) - 3
-#define ARRLIB_START_H_MAX 		(uint8)(ARRLIB_START_H / ARRLIB_U_SEC_PER_TICK) + 3
-#define ARRLIB_START_L_MIN 		(uint8)(ARRLIB_START_L / ARRLIB_U_SEC_PER_TICK) - 3
-#define ARRLIB_START_L_MAX 		(uint8)(ARRLIB_START_L / ARRLIB_U_SEC_PER_TICK) + 3
-#define ARRLIB_BIT_H_MIN 		(uint8)(ARRLIB_BIT_H / ARRLIB_U_SEC_PER_TICK) - 2
-#define ARRLIB_BIT_H_MAX 		(uint8)(ARRLIB_BIT_H / ARRLIB_U_SEC_PER_TICK) + 2
-#define ARRLIB_ONE_L_MIN 		(uint8)(ARRLIB_ONE_L / ARRLIB_U_SEC_PER_TICK) - 3
-#define ARRLIB_ONE_L_MAX 		(uint8)(ARRLIB_ONE_L / ARRLIB_U_SEC_PER_TICK) + 3
-#define ARRLIB_ZERO_L_MIN		(uint8)(ARRLIB_ZERO_L / ARRLIB_U_SEC_PER_TICK) - 2
-#define ARRLIB_ZERO_L_MAX 		(uint8)(ARRLIB_ZERO_L / ARRLIB_U_SEC_PER_TICK) + 2
-#define ARRLIB_REPEAT_L_MIN 	(uint8)(ARRLIB_REPEAT_L / ARRLIB_U_SEC_PER_TICK) - 3
-#define ARRLIB_REPEAT_L_MAX 	(uint8)(ARRLIB_REPEAT_L / ARRLIB_U_SEC_PER_TICK) + 3
+#define ARRLIB_START_H_MIN 		(uint16)(ARRLIB_START_H / ARRLIB_U_SEC_PER_TICK) - 	3
+#define ARRLIB_START_H_MAX 		(uint16)(ARRLIB_START_H / ARRLIB_U_SEC_PER_TICK) + 	3
+#define ARRLIB_START_L_MIN 		(uint16)(ARRLIB_START_L / ARRLIB_U_SEC_PER_TICK) - 	3
+#define ARRLIB_START_L_MAX 		(uint16)(ARRLIB_START_L / ARRLIB_U_SEC_PER_TICK) + 	3
+#define ARRLIB_BIT_H_MIN 		(uint16)(ARRLIB_BIT_H / ARRLIB_U_SEC_PER_TICK) - 	3
+#define ARRLIB_BIT_H_MAX 		(uint16)(ARRLIB_BIT_H / ARRLIB_U_SEC_PER_TICK) + 	3
+#define ARRLIB_ONE_L_MIN 		(uint16)(ARRLIB_ONE_L / ARRLIB_U_SEC_PER_TICK) - 	3
+#define ARRLIB_ONE_L_MAX 		(uint16)(ARRLIB_ONE_L / ARRLIB_U_SEC_PER_TICK) + 	3
+#define ARRLIB_ZERO_L_MIN		(uint16)(ARRLIB_ZERO_L / ARRLIB_U_SEC_PER_TICK) - 	3
+#define ARRLIB_ZERO_L_MAX 		(uint16)(ARRLIB_ZERO_L / ARRLIB_U_SEC_PER_TICK) + 	3
+#define ARRLIB_REPEAT_L_MIN 	(uint16)(ARRLIB_REPEAT_L / ARRLIB_U_SEC_PER_TICK) - 3
+#define ARRLIB_REPEAT_L_MAX 	(uint16)(ARRLIB_REPEAT_L / ARRLIB_U_SEC_PER_TICK) + 3
+
+// Command codes
+#define ARR_LIB_CODE_UP_1					0x0B
+#define ARR_LIB_CODE_UP_2					0x0A
+
+#define ARR_LIB_CODE_DOWN_1					0x0D
+#define ARR_LIB_CODE_DOWN_2					0x0C
+
+#define ARR_LIB_CODE_LEFT_1					0x08
+#define ARR_LIB_CODE_LEFT_2					0x09
+
+#define ARR_LIB_CODE_RIGHT_1				0x07
+#define ARR_LIB_CODE_RIGHT_2				0x06
+
+#define ARR_LIB_CODE_MENU_1					0x02
+#define ARR_LIB_CODE_MENU_2					0x02
+
+#define ARR_LIB_CODE_PLAY_1					0x5E
+#define ARR_LIB_CODE_PLAY_2					0x5F
+
+#define ARR_LIB_CODE_CENTER_1				0x5D
+#define ARR_LIB_CODE_CENTER_2				0x5C
+
+#define ARR_LIB_CODE_OLD_CENTER				0x05
 
 
 
@@ -91,6 +115,8 @@
 struct ir_sequence {
 	uint16 raw[80];
 	uint8 raw_pointer;
+	uint8 decoded;
+	char data[4];
 };
 
 /*****************************     Class     *******************************/
