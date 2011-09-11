@@ -145,34 +145,28 @@ void arrlib_interrupt_handler(void) {
 				  )
 				{
 					// First byte
-					// for(uint8 i = 17; i > 2; i = i - 2)
-					// {
-					// 	if(seq.raw[i] >= ARRLIB_ONE_L_MIN && seq.raw[i] <= ARRLIB_ONE_L_MAX)
-					// 	{
-					// 		seq.data[0] = (seq.data[0] << 1) | 1;
-					// 		seq.decoded++;
-					// 	} else if(seq.raw[i] >= ARRLIB_ZERO_L_MIN && seq.raw[i] <= ARRLIB_ZERO_L_MAX)
-					// 	{
-					// 		seq.data[0] <<= 1;
-					// 		
-					// 		seq.decoded++;
-					// 	}
-					// }
+					for(uint8 i = 17; i > 2; i = i - 2)
+					{
+						if(seq.raw[i] >= ARRLIB_ONE_L_MIN && seq.raw[i] <= ARRLIB_ONE_L_MAX)
+						{
+							seq.data[0] = (seq.data[0] << 1) | 1;
+						} else if(seq.raw[i] >= ARRLIB_ZERO_L_MIN && seq.raw[i] <= ARRLIB_ZERO_L_MAX)
+						{
+							seq.data[0] <<= 1;
+						}
+					}
 					
 					// Second byte
-					// for(uint8 i = 33; i > 18; i = i - 2)
-					// {
-					// 	if(seq.raw[i] >= ARRLIB_ONE_L_MIN && seq.raw[i] <= ARRLIB_ONE_L_MAX)
-					// 	{
-					// 		seq.data[1] = (seq.data[1] << 1) | 1;
-					// 		seq.decoded++;
-					// 	} else if(seq.raw[i] >= ARRLIB_ZERO_L_MIN && seq.raw[i] <= ARRLIB_ZERO_L_MAX)
-					// 	{
-					// 		seq.data[1] <<= 1;
-					// 		
-					// 		seq.decoded++;
-					// 	}
-					// }
+					for(uint8 i = 33; i > 18; i = i - 2)
+					{
+						if(seq.raw[i] >= ARRLIB_ONE_L_MIN && seq.raw[i] <= ARRLIB_ONE_L_MAX)
+						{
+							seq.data[1] = (seq.data[1] << 1) | 1;
+						} else if(seq.raw[i] >= ARRLIB_ZERO_L_MIN && seq.raw[i] <= ARRLIB_ZERO_L_MAX)
+						{
+							seq.data[1] <<= 1;
+						}
+					}
 					
 					// Third byte
 					for(uint8 i = 49; i > 34; i = i - 2)
@@ -180,12 +174,9 @@ void arrlib_interrupt_handler(void) {
 						if(seq.raw[i] >= ARRLIB_ONE_L_MIN && seq.raw[i] <= ARRLIB_ONE_L_MAX)
 						{
 							seq.data[2] = (seq.data[2] << 1) | 1;
-							seq.decoded++;
 						} else if(seq.raw[i] >= ARRLIB_ZERO_L_MIN && seq.raw[i] <= ARRLIB_ZERO_L_MAX)
 						{
 							seq.data[2] <<= 1;
-							
-							seq.decoded++;
 						}
 					}
 					
@@ -195,17 +186,17 @@ void arrlib_interrupt_handler(void) {
 						if(seq.raw[i] >= ARRLIB_ONE_L_MIN && seq.raw[i] <= ARRLIB_ONE_L_MAX)
 						{
 							seq.data[3] = (seq.data[3] << 1) | 1;
-							seq.decoded++;
 						} else if(seq.raw[i] >= ARRLIB_ZERO_L_MIN && seq.raw[i] <= ARRLIB_ZERO_L_MAX)
 						{
 							seq.data[3] <<= 1;
-							
-							seq.decoded++;
 						}
 					}
 				} else {
 					seq.decoded = 0;
 				}
+				
+				
+				
 				last_command = seq;
 				new_command = 1;
 			}
